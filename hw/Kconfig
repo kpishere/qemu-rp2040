@@ -8,3 +8,9 @@ config RP2040_GPIO
 
 config RP2040_TIMER
     bool
+
+config RP2040_SPI
+    bool
+
+config RP2040_I2C
+    bool

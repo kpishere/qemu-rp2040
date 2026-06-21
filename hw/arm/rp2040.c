@@ -19,6 +19,10 @@
 #include "hw/char/rp2040_uart.h"
 #include "hw/gpio/rp2040_gpio.h"
 #include "hw/timer/rp2040_timer.h"
+#include "hw/ssi/rp2040_spi.h"
+#include "hw/i2c/rp2040_i2c.h"
+#include "hw/ssi/xra1405.h"
+#include "hw/i2c/ads1015.h"
 
 #define TYPE_RP2040_SOC "rp2040-soc"
 OBJECT_DECLARE_SIMPLE_TYPE(RP2040State, RP2040_SOC)
@@ -119,6 +123,10 @@ typedef struct RP2040State {
     RP2040UARTState uart[2];
     RP2040GPIOState gpio;
     RP2040TimerState timer;
+    RP2040SPIState spi[2];
+    RP2040I2CState i2c[2];
+    RP2040XRAState xra[2];
+    RP2040ADSState ads[2];
     
     uint32_t num_cpus;
 } RP2040State;
@@ -229,6 +237,55 @@ static void rp2040_soc_realize(DeviceState *dev_soc, Error **errp)
         sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer), i,
                           qdev_get_gpio_in(DEVICE(&s->cpu[0]), RP2040_TIMER_IRQ_0 + i));
     }
+
+    /* SPI controllers (minimal) */
+    object_initialize_child(obj, "spi0", &s->spi[0], TYPE_RP2040_SPI);
+    object_initialize_child(obj, "spi1", &s->spi[1], TYPE_RP2040_SPI);
+
+    sysbus_realize(SYS_BUS_DEVICE(&s->spi[0]), &err);
+    if (err) { error_propagate(errp, err); return; }
+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[0]), 0, RP2040_SPI0_BASE);
+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[0]), 0, qdev_get_gpio_in(DEVICE(&s->cpu[0]), RP2040_SPI0_IRQ));
+
+    sysbus_realize(SYS_BUS_DEVICE(&s->spi[1]), &err);
+    if (err) { error_propagate(errp, err); return; }
+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[1]), 0, RP2040_SPI1_BASE);
+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[1]), 0, qdev_get_gpio_in(DEVICE(&s->cpu[0]), RP2040_SPI1_IRQ));
+
+    /* I2C controllers (minimal) */
+    object_initialize_child(obj, "i2c0", &s->i2c[0], TYPE_RP2040_I2C);
+    object_initialize_child(obj, "i2c1", &s->i2c[1], TYPE_RP2040_I2C);
+
+    sysbus_realize(SYS_BUS_DEVICE(&s->i2c[0]), &err);
+    if (err) { error_propagate(errp, err); return; }
+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c[0]), 0, RP2040_I2C0_BASE);
+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c[0]), 0, qdev_get_gpio_in(DEVICE(&s->cpu[0]), RP2040_I2C0_IRQ));
+
+    sysbus_realize(SYS_BUS_DEVICE(&s->i2c[1]), &err);
+    if (err) { error_propagate(errp, err); return; }
+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c[1]), 0, RP2040_I2C1_BASE);
+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c[1]), 0, qdev_get_gpio_in(DEVICE(&s->cpu[0]), RP2040_I2C1_IRQ));
+
+    /* Create and realize SPI/I2C slave device instances and attach to masters */
+    object_initialize_child(obj, "xra0", &s->xra[0], TYPE_XRA1405);
+    object_initialize_child(obj, "xra1", &s->xra[1], TYPE_XRA1405);
+    sysbus_realize(SYS_BUS_DEVICE(&s->xra[0]), &err);
+    if (err) { error_propagate(errp, err); return; }
+    sysbus_realize(SYS_BUS_DEVICE(&s->xra[1]), &err);
+    if (err) { error_propagate(errp, err); return; }
+
+    object_initialize_child(obj, "ads0", &s->ads[0], TYPE_ADS1015);
+    object_initialize_child(obj, "ads1", &s->ads[1], TYPE_ADS1015);
+    sysbus_realize(SYS_BUS_DEVICE(&s->ads[0]), &err);
+    if (err) { error_propagate(errp, err); return; }
+    sysbus_realize(SYS_BUS_DEVICE(&s->ads[1]), &err);
+    if (err) { error_propagate(errp, err); return; }
+
+    /* attach slave pointers so masters can forward operations */
+    s->spi[0].slave = &s->xra[0];
+    s->spi[1].slave = &s->xra[1];
+    s->i2c[0].slave = &s->ads[0];
+    s->i2c[1].slave = &s->ads[1];
     
     /* Create unimplemented device regions for remaining peripherals */
     create_unimplemented_device("rp2040.sysinfo", 
