@@ -83,6 +83,9 @@ Two SPI controllers for high-speed communication.
 - Add FIFO support
 - Integrate with DMA
 - Support various frame formats
+- Add device integration tests for XRA1405 GPIO expander
+
+> Note: See `tests/rp2040/test_spi.c` for the SPI/XRA1405 integration test.
 
 ### 5. I2C Controllers
 Two I2C controllers for sensor/peripheral communication.
@@ -92,6 +95,9 @@ Two I2C controllers for sensor/peripheral communication.
 - 7-bit and 10-bit addressing
 - Clock stretching
 - Multi-master arbitration
+- Add device integration tests for ADS1015 ADC
+
+> Note: See `tests/rp2040/test_i2c.c` for the I2C/ADS1015 thermistor test.
 
 ### 6. PWM Controller
 8 PWM slices with 16 total channels.

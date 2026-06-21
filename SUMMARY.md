@@ -20,6 +20,7 @@ This project successfully implemented a working QEMU emulation for the Raspberry
    - **UART**: Full implementation with FIFOs, interrupts, and baud rate control
    - **GPIO**: 30-pin GPIO controller with interrupt support
    - **Timer**: 64-bit microsecond timer with 4 alarm channels
+   - **SPI/I2C**: Basic controller stubs with XRA1405 and ADS1015 device tests
 
 4. **Build System**
    - Meson build files for QEMU integration
@@ -64,7 +65,7 @@ This project successfully implemented a working QEMU emulation for the Raspberry
 - **PIO (Programmable I/O)**: RP2040's unique feature for custom protocols
 - **Dual-core support**: Inter-processor communication via SIO
 - **DMA controller**: 12 channels with peripheral integration
-- **Other peripherals**: SPI, I2C, PWM, ADC, USB, RTC
+- **Other peripherals**: full SPI/I2C feature set, PWM, ADC, USB, RTC
 
 ### Code Quality
 

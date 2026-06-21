@@ -14,6 +14,8 @@ This project implements emulation support for the Raspberry Pi Pico's RP2040 mic
   - UART (Universal Asynchronous Receiver/Transmitter) with FIFO support
   - GPIO (General Purpose Input/Output) controller with 30 pins
   - Timer with 64-bit microsecond counter and 4 alarm channels
+  - Basic SPI controller stub with XRA1405 GPIO expander support
+  - Basic I2C controller stub with ADS1015 ADC support
 - Memory regions: 16KB ROM, 264KB SRAM, 16MB XIP Flash
 - Build system integration (Meson, Kconfig)
 - Comprehensive test suite for all implemented peripherals
@@ -23,7 +25,8 @@ This project implements emulation support for the Raspberry Pi Pico's RP2040 mic
 - PIO (Programmable I/O) not yet implemented
 - Inter-core communication (SIO) not yet implemented
 - DMA controller not yet implemented
-- SPI, I2C, PWM, ADC, USB, RTC peripherals pending
+- Full SPI/I2C controller support pending; basic XRA1405 and ADS1015 device tests are available
+- PWM, ADC, USB, RTC peripherals pending
 
 ## Features
 
@@ -35,12 +38,14 @@ This project implements emulation support for the Raspberry Pi Pico's RP2040 mic
 - UART peripherals (2x)
 - GPIO controller (30 pins)
 - Timer with 4 alarm channels
+- Basic SPI controller stub with XRA1405 GPIO expander support
+- Basic I2C controller stub with ADS1015 ADC support
 - Basic interrupt controller (NVIC)
 
 ### Not Yet Implemented
 - PIO (Programmable I/O) blocks
 - DMA controller
-- SPI/I2C controllers
+- Full SPI/I2C controller feature set
 - PWM, ADC, RTC
 - USB controller
 - Inter-core communication (SIO)
@@ -178,6 +183,8 @@ Basic peripheral tests are provided in the `tests/` directory:
 - UART loopback test
 - GPIO input/output test
 - Timer alarm test
+- SPI/XRA1405 GPIO expander test (`tests/rp2040/test_spi.c`)
+- I2C/ADS1015 ADC thermistor test (`tests/rp2040/test_i2c.c`)
 
 ### Integration Tests
 The Pico SDK examples can be used for testing:

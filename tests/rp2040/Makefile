@@ -16,7 +16,7 @@ CFLAGS += -ffunction-sections -fdata-sections
 LDFLAGS = -nostdlib -T link.ld -Wl,--gc-sections
 
 # Source files
-SOURCES = test_uart.c test_gpio.c test_timer.c
+SOURCES = test_uart.c test_gpio.c test_timer.c test_spi.c test_i2c.c
 
 # Build targets
 TARGETS = $(SOURCES:.c=.elf) $(SOURCES:.c=.bin)

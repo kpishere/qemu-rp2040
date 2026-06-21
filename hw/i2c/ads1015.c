@@ -10,7 +10,8 @@ static void ads1015_reset(DeviceState *dev)
     s->config = 0x8583; /* default config: single-shot, AIN0, 4.096V */
     s->lo_thresh = 0x0000;
     s->hi_thresh = 0x8000;
-    s->sample = 0x7FF;
+    /* Simulate Ottawa weather: 72°F (22.2°C) => 0V @ 0°C, 3.3V @ 300°C => sample 152 */
+    s->sample = 152;
 }
 
 uint16_t ads1015_master_write(void *opaque, uint32_t reg, uint16_t data)
@@ -58,7 +59,8 @@ static void ads1015_init(Object *obj)
     s->config = 0x8583;
     s->lo_thresh = 0x0000;
     s->hi_thresh = 0x8000;
-    s->sample = 0x7FF;
+    /* Simulate Ottawa weather: 72°F (22.2°C) => 0V @ 0°C, 3.3V @ 300°C => sample 152 */
+    s->sample = 152;
 }
 
 static void ads1015_class_init(ObjectClass *klass, void *data)
